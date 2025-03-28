@@ -19,7 +19,8 @@ import { useMemo, useState } from "react";
 import { useSource } from "@/hooks/useSource";
 import { SourceForm } from "../-components/forms/sourceForm";
 import { Skeleton } from "@/components/ui/skeleton";
-import ListItemSkeleton from "../-components/skeleton/ListItemSkeleton";
+import ListItemSkeleton from "../-components/placeholder/ListItemSkeleton";
+import ItemNotfoundPlaceholder from "../-components/placeholder/ItemNotfoundPlaceholder";
 
 export const Route = createFileRoute("/_private/options")({
   component: RouteComponent,
@@ -147,17 +148,11 @@ function RouteComponent() {
             ))}
           </div>
         ) : (
-          <div className="flex h-[450px] shrink-0 items-center justify-center rounded-md border border-dashed">
-            <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
-              <InfoIcon size={24} />
-              <h1 className="mt-4 text-lg font-semibold">
-                No categories found
-              </h1>
-              <p className="mb-4 mt-2 text-sm text-muted-foreground">
-                You haven't added any Categories.
-              </p>
-            </div>
-          </div>
+          <ItemNotfoundPlaceholder
+            icon={<InfoIcon size={24} />}
+            title={" No categories found"}
+            description={" You haven't added any Categories."}
+          />
         )}
       </div>
       <div className="flex flex-col gap-2">
@@ -197,17 +192,11 @@ function RouteComponent() {
               ))}
             </div>
           ) : (
-            <div className="flex h-[450px] shrink-0 items-center justify-center rounded-md border border-dashed">
-              <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
-                <InfoIcon size={24} />
-                <h1 className="mt-4 text-lg font-semibold">
-                  No payment methods found
-                </h1>
-                <p className="mb-4 mt-2 text-sm text-muted-foreground">
-                  You haven't added any Payment Methods.
-                </p>
-              </div>
-            </div>
+            <ItemNotfoundPlaceholder
+              icon={<InfoIcon size={24} />}
+              title={" No payment methods found"}
+              description={" You haven't added any Payment Methods."}
+            />
           )}
         </div>
       </div>

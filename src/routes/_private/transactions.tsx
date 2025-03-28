@@ -15,7 +15,7 @@ import { dateRangeAtom } from "@/lib/atom";
 import { useAtom } from "jotai";
 import { parseISO, compareDesc } from "date-fns";
 import { useSource } from "@/hooks/useSource";
-import CategoryButtonSkeleton from "../-components/skeleton/CategoryButtonSkeleton";
+import CategoryButtonSkeleton from "../-components/placeholder/CategoryButtonSkeleton";
 export const Route = createFileRoute("/_private/transactions")({
   component: RouteComponent,
 });

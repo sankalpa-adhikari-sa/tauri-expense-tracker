@@ -9,6 +9,8 @@ import { z } from "zod";
 import { TransactionSchema } from "@/types/publicSchema";
 import { useMemo } from "react";
 import { aggregateByCategory } from "@/lib/utils";
+import { InfoIcon } from "lucide-react";
+import ItemNotfoundPlaceholder from "../placeholder/ItemNotfoundPlaceholder";
 
 export function CategoryChart({
   data,
@@ -262,6 +264,14 @@ export function CategoryChart({
             </PieChart>
           </ChartContainer>
         )}
+        {aggregatedIncomeCategories.length < 1 &&
+          aggregatedExpenseCategories.length < 1 && (
+            <ItemNotfoundPlaceholder
+              icon={<InfoIcon size={24} />}
+              title={" No Transactions found"}
+              description={" You haven't added any Transactions."}
+            />
+          )}
       </CardContent>
     </Card>
   );

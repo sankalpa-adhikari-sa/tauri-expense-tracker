@@ -6,7 +6,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { AlertTriangle, CheckCircle2, TrendingUp } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  InfoIcon,
+  TrendingUp,
+} from "lucide-react";
 import {
   Label,
   Pie,
@@ -33,6 +38,7 @@ import { useMemo } from "react";
 import { aggregateByCategory } from "@/lib/utils";
 import { BudgetSchema, TransactionSchema } from "@/types/publicSchema";
 import { z } from "zod";
+import ItemNotfoundPlaceholder from "../placeholder/ItemNotfoundPlaceholder";
 
 interface BudgetBreakdown {
   used: number;
@@ -43,11 +49,11 @@ interface BudgetBreakdown {
 const chartConfig: ChartConfig = {
   available: {
     label: "Available",
-    color: "var(--chart-4)",
+    color: "var(--chart-2)",
   },
   used: {
     label: "Used",
-    color: "var(--chart-5)",
+    color: "var(--chart-1)",
   },
 };
 
@@ -168,16 +174,18 @@ export default function Budgeting() {
     totalBudget > 0 ? Math.round((usedAmount / totalBudget) * 100) : 0;
 
   return (
-    <Card>
-      <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+    <Card className="flex flex-col">
+      <CardHeader className="flex items-center gap-2  sm:flex-row">
         <div className="grid flex-1 gap-1 text-center sm:text-left">
           <CardTitle>Budget</CardTitle>
-          <CardDescription>
-            <span className="mr-1">Period:</span>
-            <Badge>{formatDate(budgetData?.[0]?.start)}</Badge>
-            <span className="mx-1">to</span>
-            <Badge>{formatDate(budgetData?.[0]?.end)}</Badge>
-          </CardDescription>
+          {budgetData && budgetData?.length > 0 && (
+            <CardDescription>
+              <span className="mr-1">Period:</span>
+              <Badge>{formatDate(budgetData?.[0]?.start)}</Badge>
+              <span className="mx-1">to</span>
+              <Badge>{formatDate(budgetData?.[0]?.end)}</Badge>
+            </CardDescription>
+          )}
         </div>
         {budgetData && budgetData?.length > 0 && (
           <Button variant={"outline"}>
@@ -186,156 +194,25 @@ export default function Budgeting() {
           </Button>
         )}
       </CardHeader>
-
-      <CardContent className="flex flex-row flex-wrap items-center justify-center   pb-0">
-        <div className="w-full mx-auto max-w-[300px] ">
-          <ChartContainer
-            config={chartConfig}
-            className=" aspect-square w-full "
-          >
-            <RadialBarChart
-              cy={"80%"}
-              data={budgetBreakdown}
-              endAngle={180}
-              innerRadius={130}
-              outerRadius={180}
-            >
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent hideLabel />}
-              />
-              <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
-                <Label
-                  content={({ viewBox }) => {
-                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                      return (
-                        <text
-                          x={viewBox.cx}
-                          y={viewBox.cy}
-                          textAnchor="middle"
-                          dominantBaseline="middle"
-                        >
-                          <tspan
-                            x={viewBox.cx}
-                            y={(viewBox.cy || 0) - 18}
-                            className="fill-foreground text-3xl font-bold"
-                          >
-                            {totalBudget.toLocaleString()}
-                            <tspan className="font-normal text-base fill-muted-foreground">
-                              $
-                            </tspan>
-                          </tspan>
-                          <tspan
-                            x={viewBox.cx}
-                            y={(viewBox.cy || 0) + 4}
-                            className="fill-muted-foreground"
-                          >
-                            Budget
-                          </tspan>
-                        </text>
-                      );
-                    }
-                  }}
-                />
-              </PolarRadiusAxis>
-              <RadialBar
-                dataKey="available"
-                stackId="a"
-                cornerRadius={5}
-                fill="var(--color-available)"
-                className="stroke-transparent stroke-2"
-              />
-              <RadialBar
-                dataKey="used"
-                fill="var(--color-used)"
-                stackId="a"
-                cornerRadius={5}
-                className="stroke-transparent stroke-2"
-              />
-            </RadialBarChart>
-          </ChartContainer>
-          <BudgetStatusIndicator
-            usagePercentage={usagePercentage}
-            usedAmount={usedAmount}
-            totalBudget={totalBudget}
-          />
-        </div>
-        {aggregatedExpenseCategories &&
-          aggregatedExpenseCategories.length > 0 && (
+      {budgetData && budgetData?.length > 0 ? (
+        <CardContent className="flex flex-row flex-wrap items-center justify-center   pb-0">
+          <div className="w-full mx-auto max-w-[300px] ">
             <ChartContainer
-              config={{}}
-              className=" mx-auto aspect-square w-full max-w-[300px]"
+              config={chartConfig}
+              className=" aspect-square w-full "
             >
-              <PieChart
-                {...{
-                  overflow: "visible",
-                }}
+              <RadialBarChart
+                cy={"80%"}
+                data={budgetBreakdown}
+                endAngle={180}
+                innerRadius={130}
+                outerRadius={180}
               >
                 <ChartTooltip
                   cursor={false}
-                  content={
-                    <ChartTooltipContent
-                      hideLabel
-                      formatter={(value, _, item) => {
-                        const payload = item.payload as any;
-                        return (
-                          <div className="min-w-[150px] space-y-1.5">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <div
-                                  className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
-                                  style={{
-                                    backgroundColor: `${payload.fill}`,
-                                  }}
-                                />
-                                <span className="capitalize">
-                                  {payload.name}
-                                </span>
-                              </div>
-                              <div className="flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground capitalize">
-                                {value}
-                                <span className="font-normal text-muted-foreground">
-                                  $
-                                </span>
-                              </div>
-                            </div>
-                            <div className="text-xs text-muted-foreground capitalize">
-                              <div className="flex items-center justify-between">
-                                <div>Type:</div> {payload.type}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      }}
-                    />
-                  }
+                  content={<ChartTooltipContent hideLabel />}
                 />
-                <Pie
-                  data={aggregatedExpenseCategories}
-                  paddingAngle={2}
-                  cornerRadius={8}
-                  dataKey="value"
-                  nameKey="name"
-                  innerRadius={60}
-                  strokeWidth={5}
-                  labelLine={false}
-                  label={({ payload, ...props }) => {
-                    return (
-                      <text
-                        className="capitalize"
-                        cx={props.cx}
-                        cy={props.cy}
-                        x={props.x}
-                        y={props.y}
-                        textAnchor={props.textAnchor}
-                        dominantBaseline={props.dominantBaseline}
-                        fill="var(--foreground)"
-                      >
-                        {payload.name}
-                      </text>
-                    );
-                  }}
-                >
+                <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
                   <Label
                     content={({ viewBox }) => {
                       if (viewBox && "cx" in viewBox && "cy" in viewBox) {
@@ -348,38 +225,178 @@ export default function Budgeting() {
                           >
                             <tspan
                               x={viewBox.cx}
-                              y={viewBox.cy}
+                              y={(viewBox.cy || 0) - 18}
                               className="fill-foreground text-3xl font-bold"
                             >
-                              {aggregatedExpenseCategories.reduce(
-                                (acc, { value }) => {
-                                  acc += value;
-                                  return acc;
-                                },
-                                0
-                              )}
-
+                              {totalBudget.toLocaleString()}
                               <tspan className="font-normal text-base fill-muted-foreground">
                                 $
                               </tspan>
                             </tspan>
                             <tspan
                               x={viewBox.cx}
-                              y={(viewBox.cy || 0) + 24}
+                              y={(viewBox.cy || 0) + 4}
                               className="fill-muted-foreground"
                             >
-                              Expense
+                              Budget
                             </tspan>
                           </text>
                         );
                       }
                     }}
                   />
-                </Pie>
-              </PieChart>
+                </PolarRadiusAxis>
+                <RadialBar
+                  dataKey="available"
+                  stackId="a"
+                  cornerRadius={5}
+                  fill="var(--color-available)"
+                  className="stroke-transparent stroke-2"
+                />
+                <RadialBar
+                  dataKey="used"
+                  fill="var(--color-used)"
+                  stackId="a"
+                  cornerRadius={5}
+                  className="stroke-transparent stroke-2"
+                />
+              </RadialBarChart>
             </ChartContainer>
-          )}
-      </CardContent>
+            <BudgetStatusIndicator
+              usagePercentage={usagePercentage}
+              usedAmount={usedAmount}
+              totalBudget={totalBudget}
+            />
+          </div>
+          {aggregatedExpenseCategories &&
+            aggregatedExpenseCategories.length > 0 && (
+              <ChartContainer
+                config={{}}
+                className=" mx-auto aspect-square w-full max-w-[300px]"
+              >
+                <PieChart
+                  {...{
+                    overflow: "visible",
+                  }}
+                >
+                  <ChartTooltip
+                    cursor={false}
+                    content={
+                      <ChartTooltipContent
+                        hideLabel
+                        formatter={(value, _, item) => {
+                          const payload = item.payload as any;
+                          return (
+                            <div className="min-w-[150px] space-y-1.5">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                                    style={{
+                                      backgroundColor: `${payload.fill}`,
+                                    }}
+                                  />
+                                  <span className="capitalize">
+                                    {payload.name}
+                                  </span>
+                                </div>
+                                <div className="flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground capitalize">
+                                  {value}
+                                  <span className="font-normal text-muted-foreground">
+                                    $
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="text-xs text-muted-foreground capitalize">
+                                <div className="flex items-center justify-between">
+                                  <div>Type:</div> {payload.type}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        }}
+                      />
+                    }
+                  />
+                  <Pie
+                    data={aggregatedExpenseCategories}
+                    paddingAngle={2}
+                    cornerRadius={8}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={60}
+                    strokeWidth={5}
+                    labelLine={false}
+                    label={({ payload, ...props }) => {
+                      return (
+                        <text
+                          className="capitalize"
+                          cx={props.cx}
+                          cy={props.cy}
+                          x={props.x}
+                          y={props.y}
+                          textAnchor={props.textAnchor}
+                          dominantBaseline={props.dominantBaseline}
+                          fill="var(--foreground)"
+                        >
+                          {payload.name}
+                        </text>
+                      );
+                    }}
+                  >
+                    <Label
+                      content={({ viewBox }) => {
+                        if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                          return (
+                            <text
+                              x={viewBox.cx}
+                              y={viewBox.cy}
+                              textAnchor="middle"
+                              dominantBaseline="middle"
+                            >
+                              <tspan
+                                x={viewBox.cx}
+                                y={viewBox.cy}
+                                className="fill-foreground text-3xl font-bold"
+                              >
+                                {aggregatedExpenseCategories.reduce(
+                                  (acc, { value }) => {
+                                    acc += value;
+                                    return acc;
+                                  },
+                                  0
+                                )}
+
+                                <tspan className="font-normal text-base fill-muted-foreground">
+                                  $
+                                </tspan>
+                              </tspan>
+                              <tspan
+                                x={viewBox.cx}
+                                y={(viewBox.cy || 0) + 24}
+                                className="fill-muted-foreground"
+                              >
+                                Expense
+                              </tspan>
+                            </text>
+                          );
+                        }
+                      }}
+                    />
+                  </Pie>
+                </PieChart>
+              </ChartContainer>
+            )}
+        </CardContent>
+      ) : (
+        <CardContent>
+          <ItemNotfoundPlaceholder
+            icon={<InfoIcon size={24} />}
+            title={"No Budgeting found"}
+            description={"You haven't added any Budget."}
+          />
+        </CardContent>
+      )}
     </Card>
   );
 }

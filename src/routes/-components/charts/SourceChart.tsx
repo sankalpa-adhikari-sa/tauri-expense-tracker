@@ -9,6 +9,8 @@ import { z } from "zod";
 import { TransactionSchema } from "@/types/publicSchema";
 import { useMemo } from "react";
 import { generateColor } from "@/lib/utils";
+import ItemNotfoundPlaceholder from "../placeholder/ItemNotfoundPlaceholder";
+import { InfoIcon } from "lucide-react";
 
 type AggregatedSource = {
   name: string;
@@ -270,6 +272,14 @@ export function SourceChart({
             </PieChart>
           </ChartContainer>
         )}
+        {aggregatedIncomeSources.length < 1 &&
+          aggregatedExpenseSources.length < 1 && (
+            <ItemNotfoundPlaceholder
+              icon={<InfoIcon size={24} />}
+              title={"No Transactions found"}
+              description={"You haven't added any Transactions."}
+            />
+          )}
       </CardContent>
     </Card>
   );

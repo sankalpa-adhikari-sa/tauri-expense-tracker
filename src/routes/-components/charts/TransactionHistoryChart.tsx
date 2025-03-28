@@ -22,7 +22,7 @@ import {
 import { useState } from "react";
 import { ToggleGroup } from "@radix-ui/react-toggle-group";
 import { ToggleGroupItem } from "@/components/ui/toggle-group";
-import { HandCoinsIcon, TrendingDownIcon } from "lucide-react";
+import { HandCoinsIcon, InfoIcon, TrendingDownIcon } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -30,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import ItemNotfoundPlaceholder from "../placeholder/ItemNotfoundPlaceholder";
 
 const chartConfig = {
   amount: {
@@ -121,96 +122,104 @@ export function TransactionHistoryChart({
         </div>
       </CardHeader>
       <CardContent>
-        <ChartContainer
-          config={chartConfig}
-          className="aspect-auto h-[300px] w-full"
-        >
-          <LineChart
-            accessibilityLayer
-            data={filteredData(activeChart, selectedCategory)}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
+        {filteredData(activeChart, selectedCategory).length > 0 ? (
+          <ChartContainer
+            config={chartConfig}
+            className="aspect-auto h-[300px] w-full"
           >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              allowDuplicatedCategory={false}
-              dataKey="created_at"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => {
-                const date = new Date(value);
-                return date.toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                });
+            <LineChart
+              accessibilityLayer
+              data={filteredData(activeChart, selectedCategory)}
+              margin={{
+                left: 12,
+                right: 12,
               }}
-            />
+            >
+              <CartesianGrid vertical={false} />
+              <XAxis
+                allowDuplicatedCategory={false}
+                dataKey="created_at"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={(value) => {
+                  const date = new Date(value);
+                  return date.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  });
+                }}
+              />
 
-            <ChartTooltip
-              content={
-                <ChartTooltipContent
-                  hideLabel
-                  formatter={(value, name, item) => {
-                    const payload = item.payload as any;
-                    return (
-                      <div className="min-w-[200px] space-y-1.5">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2 capitalize">
-                            <div
-                              className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
-                              style={{
-                                backgroundColor: `var(--color-${name})`,
-                              }}
-                            />
-                            <span>{payload.name}</span>
+              <ChartTooltip
+                content={
+                  <ChartTooltipContent
+                    hideLabel
+                    formatter={(value, name, item) => {
+                      const payload = item.payload as any;
+                      return (
+                        <div className="min-w-[200px] space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 capitalize">
+                              <div
+                                className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                                style={{
+                                  backgroundColor: `var(--color-${name})`,
+                                }}
+                              />
+                              <span>{payload.name}</span>
+                            </div>
+                            <div className="flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground capitalize">
+                              {value}
+                              <span className="font-normal text-muted-foreground">
+                                $
+                              </span>
+                            </div>
                           </div>
-                          <div className="flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground capitalize">
-                            {value}
-                            <span className="font-normal text-muted-foreground">
-                              $
-                            </span>
+                          <div className="text-xs text-muted-foreground capitalize">
+                            <div className="flex items-center justify-between">
+                              <div>Category:</div> {payload.category.name}
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div>Payment method:</div> {payload.source.name}
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div>Date:</div>{" "}
+                              {new Date(payload.created_at).toLocaleDateString(
+                                "en-US",
+                                {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                }
+                              )}
+                            </div>
                           </div>
                         </div>
-                        <div className="text-xs text-muted-foreground capitalize">
-                          <div className="flex items-center justify-between">
-                            <div>Category:</div> {payload.category.name}
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <div>Payment method:</div> {payload.source.name}
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <div>Date:</div>{" "}
-                            {new Date(payload.created_at).toLocaleDateString(
-                              "en-US",
-                              {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              }
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  }}
-                />
-              }
-              cursor={false}
-            />
-            <Line
-              activeDot={{ r: 4.5 }}
-              dataKey="amount"
-              type="linear"
-              fill="var(--color-amount)"
-              fillOpacity={0.4}
-              stroke="var(--color-amount)"
-            />
-          </LineChart>
-        </ChartContainer>
+                      );
+                    }}
+                  />
+                }
+                cursor={false}
+              />
+              <Line
+                activeDot={{ r: 4.5 }}
+                dataKey="amount"
+                type="linear"
+                fill="var(--color-amount)"
+                fillOpacity={0.4}
+                stroke="var(--color-amount)"
+              />
+            </LineChart>
+          </ChartContainer>
+        ) : (
+          <ItemNotfoundPlaceholder
+            icon={<InfoIcon size={24} />}
+            title={"No Transactions found"}
+            description={"You haven't added any Transactions."}
+          />
+        )}
       </CardContent>
     </Card>
   );
