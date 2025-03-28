@@ -67,7 +67,7 @@ const TransactionSchema = z.object({
 });
 const BaseBudgetSchema = z.object({
   name: z.string().trim().min(3, "Name must be atleast 3 characters long"),
-  amount: z.number().nullable(),
+  amount: z.number(),
   start: z.string().datetime(),
   end: z.string().datetime(),
 });

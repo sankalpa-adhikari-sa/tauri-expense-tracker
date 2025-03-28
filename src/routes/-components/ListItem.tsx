@@ -24,7 +24,7 @@ export default function ListItem({
   return (
     <div className="w-full bg-accent py-3 px-4 flex flex-row itens-center justify-between rounded-md group hover:bg-gradient-to-r hover:from-muted-foreground hover:to-primary hover:text-primary-foreground">
       <div className="flex flex-col ">
-        <p className="flex flex-row text-md font-semibold gap-4">
+        <p className="flex flex-row text-base font-normal capitalize gap-4">
           <span>{data.name}</span>{" "}
           {data.type && (
             <Badge variant={"destructive"} className="h-fit">
@@ -48,7 +48,7 @@ export default function ListItem({
           )}
         </p>
         {data.description && (
-          <p className="text-sm font-medium text-muted-foreground">
+          <p className="text-sm font-normal text-muted-foreground">
             {data.description}
           </p>
         )}

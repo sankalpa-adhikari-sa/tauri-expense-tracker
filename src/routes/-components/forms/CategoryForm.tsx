@@ -87,7 +87,9 @@ export function CategoryForm({
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
               />
-              <FormDescription>Example: XYZbank, XYZWallet</FormDescription>
+              <FormDescription>
+                Example: Food, Hygeine, Medicine
+              </FormDescription>
               <FormMessage field={field} />
             </div>
           );
@@ -126,7 +128,7 @@ export function CategoryForm({
                 }
                 defaultValue={field.state.value}
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>

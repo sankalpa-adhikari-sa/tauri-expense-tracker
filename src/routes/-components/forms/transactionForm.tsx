@@ -179,7 +179,7 @@ export function TransactionForm({
             return (
               <div className="space-y-2 flex-1">
                 <Label className="text-sm leading-[1.18] " htmlFor={field.name}>
-                  Payment gateway:
+                  Payment Method:
                 </Label>
                 <Select
                   onValueChange={(value) => field.handleChange(value)}

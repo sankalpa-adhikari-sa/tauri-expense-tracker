@@ -31,19 +31,8 @@ import { Badge } from "@/components/ui/badge";
 import { useTransaction } from "@/hooks/useTransaction";
 import { useMemo } from "react";
 import { aggregateByCategory } from "@/lib/utils";
-
-interface Budget {
-  start: string;
-  end: string;
-  amount: number;
-  name: string;
-}
-
-interface Transaction {
-  type: "expense" | "income";
-  amount: number;
-  category: string;
-}
+import { BudgetSchema, TransactionSchema } from "@/types/publicSchema";
+import { z } from "zod";
 
 interface BudgetBreakdown {
   used: number;
@@ -63,8 +52,8 @@ const chartConfig: ChartConfig = {
 };
 
 const calculateBudgetBreakdown = (
-  budgetData?: Budget[],
-  transactionsData?: Transaction[]
+  budgetData?: z.infer<typeof BudgetSchema>[],
+  transactionsData?: z.infer<typeof TransactionSchema>[]
 ): BudgetBreakdown[] => {
   if (!budgetData || budgetData.length === 0) return [];
 
@@ -271,121 +260,125 @@ export default function Budgeting() {
             totalBudget={totalBudget}
           />
         </div>
-
-        <ChartContainer
-          config={{}}
-          className=" mx-auto aspect-square w-full max-w-[300px]"
-        >
-          <PieChart
-            {...{
-              overflow: "visible",
-            }}
-          >
-            <ChartTooltip
-              cursor={false}
-              content={
-                <ChartTooltipContent
-                  hideLabel
-                  formatter={(value, _, item) => {
-                    const payload = item.payload as any;
-                    return (
-                      <div className="min-w-[150px] space-y-1.5">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div
-                              className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
-                              style={{
-                                backgroundColor: `${payload.fill}`,
-                              }}
-                            />
-                            <span className="capitalize">{payload.name}</span>
-                          </div>
-                          <div className="flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground capitalize">
-                            {value}
-                            <span className="font-normal text-muted-foreground">
-                              $
-                            </span>
-                          </div>
-                        </div>
-                        <div className="text-xs text-muted-foreground capitalize">
-                          <div className="flex items-center justify-between">
-                            <div>Type:</div> {payload.type}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  }}
-                />
-              }
-            />
-            <Pie
-              data={aggregatedExpenseCategories}
-              paddingAngle={2}
-              cornerRadius={8}
-              dataKey="value"
-              nameKey="name"
-              innerRadius={60}
-              strokeWidth={5}
-              labelLine={false}
-              label={({ payload, ...props }) => {
-                return (
-                  <text
-                    className="capitalize"
-                    cx={props.cx}
-                    cy={props.cy}
-                    x={props.x}
-                    y={props.y}
-                    textAnchor={props.textAnchor}
-                    dominantBaseline={props.dominantBaseline}
-                    fill="var(--foreground)"
-                  >
-                    {payload.name}
-                  </text>
-                );
-              }}
+        {aggregatedExpenseCategories &&
+          aggregatedExpenseCategories.length > 0 && (
+            <ChartContainer
+              config={{}}
+              className=" mx-auto aspect-square w-full max-w-[300px]"
             >
-              <Label
-                content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+              <PieChart
+                {...{
+                  overflow: "visible",
+                }}
+              >
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                      hideLabel
+                      formatter={(value, _, item) => {
+                        const payload = item.payload as any;
+                        return (
+                          <div className="min-w-[150px] space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <div
+                                  className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                                  style={{
+                                    backgroundColor: `${payload.fill}`,
+                                  }}
+                                />
+                                <span className="capitalize">
+                                  {payload.name}
+                                </span>
+                              </div>
+                              <div className="flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground capitalize">
+                                {value}
+                                <span className="font-normal text-muted-foreground">
+                                  $
+                                </span>
+                              </div>
+                            </div>
+                            <div className="text-xs text-muted-foreground capitalize">
+                              <div className="flex items-center justify-between">
+                                <div>Type:</div> {payload.type}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }}
+                    />
+                  }
+                />
+                <Pie
+                  data={aggregatedExpenseCategories}
+                  paddingAngle={2}
+                  cornerRadius={8}
+                  dataKey="value"
+                  nameKey="name"
+                  innerRadius={60}
+                  strokeWidth={5}
+                  labelLine={false}
+                  label={({ payload, ...props }) => {
                     return (
                       <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
+                        className="capitalize"
+                        cx={props.cx}
+                        cy={props.cy}
+                        x={props.x}
+                        y={props.y}
+                        textAnchor={props.textAnchor}
+                        dominantBaseline={props.dominantBaseline}
+                        fill="var(--foreground)"
                       >
-                        <tspan
-                          x={viewBox.cx}
-                          y={viewBox.cy}
-                          className="fill-foreground text-3xl font-bold"
-                        >
-                          {aggregatedExpenseCategories.reduce(
-                            (acc, { value }) => {
-                              acc += value;
-                              return acc;
-                            },
-                            0
-                          )}
-
-                          <tspan className="font-normal text-base fill-muted-foreground">
-                            $
-                          </tspan>
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground"
-                        >
-                          Expense
-                        </tspan>
+                        {payload.name}
                       </text>
                     );
-                  }
-                }}
-              />
-            </Pie>
-          </PieChart>
-        </ChartContainer>
+                  }}
+                >
+                  <Label
+                    content={({ viewBox }) => {
+                      if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                        return (
+                          <text
+                            x={viewBox.cx}
+                            y={viewBox.cy}
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                          >
+                            <tspan
+                              x={viewBox.cx}
+                              y={viewBox.cy}
+                              className="fill-foreground text-3xl font-bold"
+                            >
+                              {aggregatedExpenseCategories.reduce(
+                                (acc, { value }) => {
+                                  acc += value;
+                                  return acc;
+                                },
+                                0
+                              )}
+
+                              <tspan className="font-normal text-base fill-muted-foreground">
+                                $
+                              </tspan>
+                            </tspan>
+                            <tspan
+                              x={viewBox.cx}
+                              y={(viewBox.cy || 0) + 24}
+                              className="fill-muted-foreground"
+                            >
+                              Expense
+                            </tspan>
+                          </text>
+                        );
+                      }
+                    }}
+                  />
+                </Pie>
+              </PieChart>
+            </ChartContainer>
+          )}
       </CardContent>
     </Card>
   );
