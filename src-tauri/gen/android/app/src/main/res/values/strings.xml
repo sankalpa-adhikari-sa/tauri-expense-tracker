@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">expense</string>
+    <string name="main_activity_title">expense</string>
+</resources>
