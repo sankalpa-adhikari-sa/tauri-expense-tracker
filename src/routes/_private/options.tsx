@@ -18,6 +18,8 @@ import { useMemo, useState } from "react";
 
 import { useSource } from "@/hooks/useSource";
 import { SourceForm } from "../-components/forms/sourceForm";
+import { Skeleton } from "@/components/ui/skeleton";
+import ListItemSkeleton from "../-components/skeleton/ListItemSkeleton";
 
 export const Route = createFileRoute("/_private/options")({
   component: RouteComponent,
@@ -125,8 +127,14 @@ function RouteComponent() {
             <CategoryForm />
           </ResponsiveDrawerDialog>
         </div>
-
-        {filteredCategories && filteredCategories.length > 0 ? (
+        {isCategoryLoading ? (
+          <div className="flex flex-col w-full gap-3">
+            <ListItemSkeleton />
+            <ListItemSkeleton />
+            <ListItemSkeleton />
+            <ListItemSkeleton />
+          </div>
+        ) : filteredCategories && filteredCategories.length > 0 ? (
           <div className="flex flex-col gap-3">
             {filteredCategories?.map((item) => (
               <ListItem
@@ -169,7 +177,14 @@ function RouteComponent() {
           </ResponsiveDrawerDialog>
         </div>
         <div>
-          {source && source.length > 0 ? (
+          {isSourceLoading ? (
+            <div className="flex flex-col w-full gap-3">
+              <ListItemSkeleton />
+              <ListItemSkeleton />
+              <ListItemSkeleton />
+              <ListItemSkeleton />
+            </div>
+          ) : source && source.length > 0 ? (
             <div className="flex flex-col gap-3">
               {source?.map((item) => (
                 <ListItem

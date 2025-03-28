@@ -15,6 +15,7 @@ import { dateRangeAtom } from "@/lib/atom";
 import { useAtom } from "jotai";
 import { parseISO, compareDesc } from "date-fns";
 import { useSource } from "@/hooks/useSource";
+import CategoryButtonSkeleton from "../-components/skeleton/CategoryButtonSkeleton";
 export const Route = createFileRoute("/_private/transactions")({
   component: RouteComponent,
 });
@@ -64,12 +65,9 @@ function RouteComponent() {
         <div className="flex flex-row flex-wrap gap-2">
           {isCategoryLoading ? (
             <>
-              <Skeleton className="h-16 w-16" />
-              <Skeleton className="h-16 w-16" />
-              <Skeleton className="h-16 w-16" />
-              <Skeleton className="h-16 w-16" />
-              <Skeleton className="h-16 w-16" />
-              <Skeleton className="h-16 w-16" />
+              <CategoryButtonSkeleton />
+              <CategoryButtonSkeleton />
+              <CategoryButtonSkeleton />
             </>
           ) : (
             <>
@@ -121,12 +119,9 @@ function RouteComponent() {
         <div className="flex flex-row flex-wrap gap-2">
           {isCategoryLoading ? (
             <>
-              <Skeleton className="h-16 w-16" />
-              <Skeleton className="h-16 w-16" />
-              <Skeleton className="h-16 w-16" />
-              <Skeleton className="h-16 w-16" />
-              <Skeleton className="h-16 w-16" />
-              <Skeleton className="h-16 w-16" />
+              <CategoryButtonSkeleton />
+              <CategoryButtonSkeleton />
+              <CategoryButtonSkeleton />
             </>
           ) : (
             <>
